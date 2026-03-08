@@ -46,7 +46,7 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            return res.status(401).json({
+            return res.status(400).json({
                 success: false,
                 message: 'Email or Password is missing'
             })
@@ -74,6 +74,16 @@ export const login = async (req, res) => {
 
         const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
+        const populatedPost = await Promise.all(
+            user.posts.map(async (postId) => {
+                const post = await Post.findById(postId);
+                if (post.author.equals(user._id)) {
+                    return post;
+                }
+                return null;
+            })
+        )
+
         user = {
             id: user._id,
             username: user.username,
@@ -82,7 +92,7 @@ export const login = async (req, res) => {
             bio: user.bio,
             followers: user.followers,
             following: user.following,
-            posts: user.posts,
+            posts: populatedPost,
             bookmarks: user.bookmarks
         }
         return res.status(200).cookie('token', token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' }).json({

@@ -10,7 +10,7 @@ const postSchema = new mongoose.Schema({
         required: true,
     },
     author: {
-        author: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
     likes: [
@@ -19,7 +19,7 @@ const postSchema = new mongoose.Schema({
             ref: 'User',
         }
     ],
-    commnets: [
+    comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Comment',

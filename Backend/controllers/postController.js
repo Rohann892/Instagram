@@ -217,7 +217,7 @@ export const addComment = async (req, res) => {
 };
 
 
-export const getAllPostComments = async (req, res) => {
+export const getCommentOfPost = async (req, res) => {
     try {
         const postId = req.params.id;
         const comments = await Comment.find({ post: postId }).populate('author', 'usernane, profileImgae');
