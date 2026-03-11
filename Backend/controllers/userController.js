@@ -115,7 +115,7 @@ export const logout = (_, res) => {
     try {
         return res.status(200).cookie('token', "", { maxAge: 0 }).json({
             success: true,
-            messsage: 'Logged out Successfully'
+            message: 'Logged out Successfully'
         })
     } catch (error) {
         console.log(error);

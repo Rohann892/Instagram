@@ -118,6 +118,7 @@ const Signup = () => {
         {loading ? (
           <Button>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            please wait
           </Button>
         ) : (
           <Button type="submit">{login ? "Login" : "Signup"}</Button>
