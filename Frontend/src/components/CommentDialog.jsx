@@ -7,8 +7,18 @@ import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { CiBookmark, CiFaceSmile } from "react-icons/ci";
+import { useDispatch, useSelector } from "react-redux";
+import Comment from "./Comment";
+import axios from "axios";
+import { setPosts } from "@/redux/postSlice";
+import { toast } from "sonner";
 
 const CommentDialog = ({ open, setOpen }) => {
+  const { posts, selectedPost } = useSelector((store) => store.post);
+  const { user } = useSelector((store) => store.auth);
+
+  const [comment, setComment] = useState(selectedPost?.comments || []);
+  const dispatch = useDispatch();
   const [text, setText] = useState("");
 
   const changeHandler = (e) => {
@@ -20,8 +30,35 @@ const CommentDialog = ({ open, setOpen }) => {
     }
   };
 
-  const submitHandler = () => {
-    console.log(text);
+  const sendMessageHandler = async (postId) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/v1/post/${postId}/comment`,
+        { text, id: user?._id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.success) {
+        const updatedCommentData = [...comment, res.data.comment];
+        setComment(updatedCommentData);
+
+        const updatedPostData = posts.map((p) =>
+          p._id === selectedPost._id
+            ? { ...p, comments: [...comment, res.data.comment] }
+            : p,
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+        setText("");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <Dialog open={open}>
@@ -31,16 +68,19 @@ const CommentDialog = ({ open, setOpen }) => {
       >
         <div className="flex flex-1">
           <div className="w-1/2">
-            <img src={PostImg} alt="" className="rounded-l-xl" />
+            <img src={selectedPost?.image} alt="" className="rounded-l-xl" />
           </div>
           <div className="w-1/2 flex flex-col justify-between mt-2 ml-4">
             <div className="flex items-center justify-between border-b border-gray-100 p-2">
               <div className="flex gap-2 items-center">
                 <Avatar>
-                  <AvatarImage src="" alt="user_img" />
+                  <AvatarImage
+                    src={selectedPost?.author?.profileImage}
+                    alt="user_img"
+                  />
                   <AvatarFallback>Cn</AvatarFallback>
                 </Avatar>
-                <Link to="/profile">Rohann</Link>
+                <Link to="/profile">{selectedPost?.author?.username}</Link>
               </div>
               <Dialog>
                 <DialogTrigger asChild>
@@ -83,7 +123,9 @@ const CommentDialog = ({ open, setOpen }) => {
               </Dialog>
             </div>
             <div className="flex-1 overflow-y-auto p-4 border-b border-gray-100">
-              comments will come here
+              {comment?.map((comment) => (
+                <Comment key={comment?._id} comment={comment} />
+              ))}
             </div>
             <div className="flex flex-col mt-2 pb-4 border-b border-gray-100">
               <div className="flex justify-between space-y-2 p-2">
@@ -96,7 +138,9 @@ const CommentDialog = ({ open, setOpen }) => {
                   <CiBookmark className="w-6 h-6 cursor-pointer" />
                 </div>
               </div>
-              <span className="font-semibold pl-2">25k likes</span>
+              <span className="font-semibold pl-2">
+                {selectedPost?.likes?.length}
+              </span>
               <span className="pl-2">4 hours ago</span>
             </div>
             <div className="flex justify-between mt-3 p-2">
@@ -111,9 +155,9 @@ const CommentDialog = ({ open, setOpen }) => {
                 />
               </div>
               <Button
-                onClick={submitHandler}
+                onClick={() => sendMessageHandler(selectedPost?._id)}
                 disabled={!text.trim()}
-                className={`bg-transparent text-gray-500 text-base font-medium`}
+                className={`bg-blue-600 text-white text-base font-medium`}
               >
                 Post
               </Button>

@@ -3,9 +3,7 @@ import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
-import PostImage from "../assets/postImage.jpg";
-import { IoMdHeartEmpty } from "react-icons/io";
-import { FaRegComment } from "react-icons/fa";
+import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { CiBookmark } from "react-icons/ci";
 import CommentDialog from "./CommentDialog";
 import { CiFaceSmile } from "react-icons/ci";
@@ -13,13 +11,17 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "sonner";
-import { setPosts } from "@/redux/postSlice";
+import { setPosts, setSelectedPost } from "@/redux/postSlice";
 
 const Post = ({ post }) => {
-  const [text, setText] = useState("");
-  const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.post);
+
+  const [text, setText] = useState("");
+  const [open, setOpen] = useState(false);
+  const [liked, setLiked] = useState(post?.likes?.includes(user?._id) || false);
+  const [postLike, setPostLike] = useState(post?.likes?.length || 0);
+  const [comment, setComment] = useState(post?.comments);
   const dispatch = useDispatch();
 
   const changeHandler = (e) => {
@@ -28,6 +30,37 @@ const Post = ({ post }) => {
       setText(inputText);
     } else {
       setText("");
+    }
+  };
+
+  const likeOrDislikeHandler = async (postId) => {
+    try {
+      const action = liked ? "dislike" : "like";
+      const res = await axios.post(
+        `http://localhost:8080/api/v1/post/${postId}/${action}`,
+        { id: user?._id },
+        { withCredentials: true },
+      );
+      if (res.data.success) {
+        const updatedLikes = liked ? postLike - 1 : postLike + 1;
+        setPostLike(updatedLikes);
+        setLiked(!liked);
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id
+            ? {
+                ...p,
+                likes: liked
+                  ? p.likes.filter((id) => id !== user._id)
+                  : [...p.likes, user._id],
+              }
+            : p,
+        );
+
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -42,7 +75,9 @@ const Post = ({ post }) => {
       );
       console.log(res);
       if (res.data.success) {
-        const updatedPost = posts.filter((postItem) => postItem !== post._id);
+        const updatedPost = posts.filter(
+          (postItem) => postItem._id !== post._id,
+        );
         dispatch(setPosts(updatedPost));
         toast.success(res.data.message);
         setOpen(false);
@@ -51,13 +86,43 @@ const Post = ({ post }) => {
       toast.error(error.response?.data?.message);
     }
   };
+
+  const commentHandler = async (postId) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/v1/post/${postId}/comment`,
+        { text, id: user?._id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.success) {
+        const updatedCommentData = [...comment, res.data.comment];
+        setComment(updatedCommentData);
+
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id ? { ...p, comments: updatedCommentData } : p,
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <Avatar>
             <AvatarImage src={post?.author?.profileImage} alt="post_image" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>
+              {post?.author?.username?.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <Link to="/profile" className="text-base font-medium">
             {post?.author?.username}
@@ -98,12 +163,28 @@ const Post = ({ post }) => {
       <div className="flex justify-between items-center mt-2">
         <div className="flex gap-3 cursor-pointer">
           <div className="flex gap-2">
-            <IoMdHeartEmpty className="w-6 h-6" />
-            <span>{post?.likes?.length}</span>
+            {liked ? (
+              <IoMdHeart
+                onClick={() => likeOrDislikeHandler(post?._id)}
+                className="w-6 h-6 text-red-500 cursor-pointer"
+              />
+            ) : (
+              <IoMdHeartEmpty
+                onClick={() => likeOrDislikeHandler(post?._id)}
+                className="w-6 h-6 cursor-pointer"
+              />
+            )}
+            <span>{postLike}</span>
           </div>
           <div className="flex gap-2">
-            <MessageCircle onClick={() => setOpen(true)} className="w-5 h-5" />
-            <span>25</span>
+            <MessageCircle
+              onClick={() => {
+                setOpen(true);
+                dispatch(setSelectedPost(post));
+              }}
+              className="w-5 h-5"
+            />
+            <span>{post?.comments?.length || 0}</span>
           </div>
           <Send className="w-5 h-5" />
         </div>
@@ -127,7 +208,10 @@ const Post = ({ post }) => {
           className="outline-none text-sm"
         />
         {text ? (
-          <span className="text-sm px-2 py-1 bg-[#3badf8] text-white rounded-md">
+          <span
+            onClick={() => commentHandler(post?._id)}
+            className="text-sm px-2 py-1 bg-[#3badf8] text-white rounded-md"
+          >
             Post
           </span>
         ) : (

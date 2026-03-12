@@ -1,4 +1,5 @@
 import sharp from 'sharp';
+import mongoose from 'mongoose';
 import Post from '../models/postModel.js'
 import cloudinary from '../config/cloudinary.js';
 import User from '../models/userModel.js';
@@ -90,30 +91,41 @@ export const getAllpost = async (req, res) => {
 export const getUserPost = async (req, res) => {
     try {
         const authorId = req.authUserId;
-        const posts = (await Post.find({ author: authUserId })).toSorted({ createdAt: -1 })
+
+        const posts = await Post.find({ author: authorId })
+            .sort({ createdAt: -1 })
             .populate({
-                path: 'author',
-                select: 'username, profileImage'
-            }).populate({
-                path: 'comments', sort: { createdAt: -1 },
-                populate: {
-                    path: author,
-                    select: 'username, profileImage'
-                }
+                path: "author",
+                select: "username profileImage",
             })
+            .populate({
+                path: "comments",
+                options: { sort: { createdAt: -1 } },
+                populate: {
+                    path: "author",
+                    select: "username profileImage",
+                },
+            });
+
+        return res.status(200).json({
+            success: true,
+            posts,
+        });
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
-            message: error.message
-        })
     }
-}
-
+};
 
 export const likePost = async (req, res) => {
     try {
         const id = req.authUserId;
         const postId = req.params.id;
+        if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid post id'
+            });
+        }
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
@@ -145,6 +157,12 @@ export const dislikePost = async (req, res) => {
     try {
         const id = req.authUserId;
         const postId = req.params.id;
+        if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid post id'
+            });
+        }
         const post = await Post.findById(postId);
 
         if (!post) {
@@ -177,7 +195,16 @@ export const dislikePost = async (req, res) => {
 export const addComment = async (req, res) => {
     try {
         const id = req.authUserId;
-        const posId = req.params.id;
+        const postId = req.params.id;
+
+        // validate postId before querying MongoDB to avoid CastError
+        if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid post id'
+            });
+        }
+
         const post = await Post.findById(postId);
         const { text } = req.body;
         if (!post) {
@@ -198,16 +225,20 @@ export const addComment = async (req, res) => {
             text,
             author: id,
             post: postId
-        }).populate({
-            paht: 'author',
-            select: 'username, profileImage'
-        })
-        post.commnets.push(comment._id)
+        });
+
+        await comment.populate({
+            path: "author",
+            select: "username profileImage",
+        });
+
+        post.comments.push(comment._id);
         await post.save();
 
         return res.status(201).json({
             success: true,
-            message: 'Comment created Successfully'
+            message: 'Comment created Successfully',
+            comment
         })
     } catch (error) {
         console.log(error);
@@ -222,33 +253,31 @@ export const addComment = async (req, res) => {
 export const getCommentOfPost = async (req, res) => {
     try {
         const postId = req.params.id;
-        const comments = await Comment.find({ post: postId }).populate('author', 'usernane, profileImgae');
 
-        if (!comments) {
-            return res.status(400).json({
-                success: false,
-                message: 'No comments on this post'
-            })
-        }
+        const comments = await Comment.find({ post: postId }).populate(
+            "author",
+            "username profileImage"
+        );
 
         return res.status(200).json({
             success: true,
-            commnets
-        })
+            comments,
+        });
     } catch (error) {
         console.log(error);
-        return res.status(500).json({
-            success: false,
-            message: error.message
-        })
     }
-}
-
+};
 
 export const deletePost = async (req, res) => {
     try {
         const postId = req.params.id;
         const authorId = req.authUserId;
+        if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid post id'
+            });
+        }
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
@@ -292,6 +321,12 @@ export const bookmarkPost = async (req, res) => {
     try {
         const postId = req.params.id;
         const authorId = req.authUserId;
+        if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid post id'
+            });
+        }
         const post = await Post.findById(postId);
 
         if (!post) {

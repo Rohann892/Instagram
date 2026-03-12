@@ -17,6 +17,7 @@ import { IoLogoInstagram } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
 import CreatePost from "./CreatePost";
+import { setPosts, setSelectedPost } from "@/redux/postSlice";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ const LeftSideBar = () => {
       });
       if (res.data.success) {
         dispatch(setAuthUser(null));
+        dispatch(setSelectedPost(null));
+        dispatch(setPosts([]));
         toast.success(res.data.message);
       }
     } catch (error) {
