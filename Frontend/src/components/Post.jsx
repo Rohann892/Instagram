@@ -10,17 +10,45 @@ import { CiBookmark } from "react-icons/ci";
 import CommentDialog from "./CommentDialog";
 import { CiFaceSmile } from "react-icons/ci";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "sonner";
+import { setPosts } from "@/redux/postSlice";
 
-const Post = () => {
+const Post = ({ post }) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
+  const { user } = useSelector((store) => store.auth);
+  const { posts } = useSelector((store) => store.post);
+  const dispatch = useDispatch();
 
   const changeHandler = (e) => {
     const inputText = e.target.value;
-    if (inputText) {
+    if (inputText.trim()) {
       setText(inputText);
     } else {
       setText("");
+    }
+  };
+
+  const deletePost = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/v1/post/delete/${post._id}`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(res);
+      if (res.data.success) {
+        const updatedPost = posts.filter((postItem) => postItem !== post._id);
+        dispatch(setPosts(updatedPost));
+        toast.success(res.data.message);
+        setOpen(false);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
     }
   };
   return (
@@ -28,11 +56,11 @@ const Post = () => {
       <div className="flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <Avatar>
-            <AvatarImage src="" alt="post_image" />
+            <AvatarImage src={post?.author?.profileImage} alt="post_image" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <Link to="/profile" className="text-base font-medium">
-            Rohann
+            {post?.author?.username}
           </Link>
           <div className="flex items-center gap-2">
             <span className="top-2">.</span>
@@ -40,15 +68,18 @@ const Post = () => {
           </div>
         </div>
         <Dialog>
-          <DialogTrigger as child>
-            <MoreHorizontal className="curosr-pointer" />
+          <DialogTrigger asChild>
+            <MoreHorizontal className="cursor-pointer" />
           </DialogTrigger>
           <DialogContent className={`flex flex-col items-center text-center`}>
             <Button
+              onClick={deletePost}
               variant="ghost"
               className={`cursor-pointer w-fit text-[#ed4956] font-bold`}
             >
-              Unfollow
+              {user?._id?.toString() === post?.author?._id?.toString()
+                ? "Delete"
+                : "Unfollow"}
             </Button>
             <Button variant="ghost" className={`cursor-pointer w-fit`}>
               Add to favorites
@@ -60,7 +91,7 @@ const Post = () => {
         </Dialog>
       </div>
       <img
-        src={PostImage}
+        src={post?.image}
         alt=""
         className="my-2 rounded-md w-full aspect-square object-cover"
       />
@@ -68,7 +99,7 @@ const Post = () => {
         <div className="flex gap-3 cursor-pointer">
           <div className="flex gap-2">
             <IoMdHeartEmpty className="w-6 h-6" />
-            <span>1k</span>
+            <span>{post?.likes?.length}</span>
           </div>
           <div className="flex gap-2">
             <MessageCircle onClick={() => setOpen(true)} className="w-5 h-5" />
@@ -81,7 +112,7 @@ const Post = () => {
         </div>
       </div>
       <p>
-        <span className="text-base font-semibold">Rohann</span> user captions
+        <span className="text-base font-semibold">Rohann</span> {post?.caption}
       </p>
       {/* <span className="cursor-pointer text-sm text-gray-400">
         View all 25 comments

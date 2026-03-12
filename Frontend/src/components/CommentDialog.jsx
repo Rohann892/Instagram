@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import PostImg from "../assets/postImage.jpg";
-import { MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import { MessageCircle, MoreHorizontal, Send, TicketX } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
@@ -9,6 +9,20 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import { CiBookmark, CiFaceSmile } from "react-icons/ci";
 
 const CommentDialog = ({ open, setOpen }) => {
+  const [text, setText] = useState("");
+
+  const changeHandler = (e) => {
+    const inputText = e.target.value;
+    if (inputText.trim()) {
+      setText(inputText);
+    } else {
+      setText("");
+    }
+  };
+
+  const submitHandler = () => {
+    console.log(text);
+  };
   return (
     <Dialog open={open}>
       <DialogContent
@@ -29,8 +43,8 @@ const CommentDialog = ({ open, setOpen }) => {
                 <Link to="/profile">Rohann</Link>
               </div>
               <Dialog>
-                <DialogTrigger as child>
-                  <MoreHorizontal className="curosr-pointer" />
+                <DialogTrigger asChild>
+                  <MoreHorizontal className="cursor-pointer" />
                 </DialogTrigger>
                 <DialogContent
                   className={`flex flex-col items-center text-center`}
@@ -90,11 +104,15 @@ const CommentDialog = ({ open, setOpen }) => {
                 <CiFaceSmile className="w-8 h-8" />
                 <input
                   type="text"
+                  value={text}
+                  onChange={changeHandler}
                   placeholder="Add a comment...."
                   className="w-full border-none outline-none font-medium"
                 />
               </div>
               <Button
+                onClick={submitHandler}
+                disabled={!text.trim()}
                 className={`bg-transparent text-gray-500 text-base font-medium`}
               >
                 Post

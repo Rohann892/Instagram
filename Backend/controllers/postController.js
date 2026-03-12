@@ -49,7 +49,8 @@ export const addPost = async (req, res) => {
         await post.populate({ path: 'author', select: '-password' });
         return res.status(201).json({
             success: true,
-            message: 'Post created successfully'
+            message: 'Post created successfully',
+            post,
         })
     } catch (error) {
         console.log(error);
@@ -62,13 +63,14 @@ export const addPost = async (req, res) => {
 
 export const getAllpost = async (req, res) => {
     try {
-        const posts = (await Post.find()).sort({ createdAt: -1 })
-            .populate({ path: 'author', select: 'username, profileImage' })
+        const posts = await Post.find()
+            .sort({ createdAt: -1 })
+            .populate({ path: 'author', select: 'username profileImage' })
             .populate({
                 path: 'comments', sort: { createdAt: -1 },
                 populate: {
-                    path: author,
-                    select: 'username, profileImage'
+                    path: 'author',
+                    select: 'username profileImage'
                 }
             })
 
@@ -246,7 +248,7 @@ export const getCommentOfPost = async (req, res) => {
 export const deletePost = async (req, res) => {
     try {
         const postId = req.params.id;
-        const authorId = req.params.id;
+        const authorId = req.authUserId;
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
@@ -265,7 +267,7 @@ export const deletePost = async (req, res) => {
         await Post.findByIdAndDelete(postId);
         // deleting the post from the userSchema as it contain the array of post 
         let user = await User.findById(authorId);
-        user.posts = await user.posts.filter(id => id.toString() !== postId);
+        user.posts = user.posts.filter(id => id.toString() !== postId);
         await user.save();
 
 

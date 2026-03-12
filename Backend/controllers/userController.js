@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import getDataUri from "../config/dataUri.js";
 import cloudinary from "../config/cloudinary.js";
+import Post from '../models/postModel.js'
 
 export const register = async (req, res) => {
     try {
@@ -77,6 +78,7 @@ export const login = async (req, res) => {
         const populatedPost = await Promise.all(
             user.posts.map(async (postId) => {
                 const post = await Post.findById(postId);
+                if (!post) return null;
                 if (post.author.equals(user._id)) {
                     return post;
                 }
@@ -85,7 +87,7 @@ export const login = async (req, res) => {
         )
 
         user = {
-            id: user._id,
+            _id: user._id,
             username: user.username,
             email: user.email,
             profileImage: user.profileImage,

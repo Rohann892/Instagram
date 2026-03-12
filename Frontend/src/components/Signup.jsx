@@ -7,9 +7,13 @@ import { USER_API_END_POINT } from "@/lib/constant";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "@/redux/authSlice";
 
 const Signup = () => {
   const [login, setLogin] = useState(true);
+  const dispatch = useDispatch();
+
   const [input, setInput] = useState({
     username: "",
     email: "",
@@ -38,6 +42,7 @@ const Signup = () => {
         if (res.data.success) {
           toast.success(res.data.message);
           console.log("Login successful:", res);
+          dispatch(setAuthUser(res.data.user));
           navigate("/home");
         }
       } catch (error) {
