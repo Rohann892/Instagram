@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import PostImg from "../assets/postImage.jpg";
-import { MessageCircle, MoreHorizontal, Send, TicketX } from "lucide-react";
+import {
+  Badge,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
+  TicketX,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";

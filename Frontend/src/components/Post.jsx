@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import { Badge, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { CiBookmark } from "react-icons/ci";
@@ -15,7 +15,7 @@ import { setPosts, setSelectedPost } from "@/redux/postSlice";
 
 const Post = ({ post }) => {
   const { user } = useSelector((store) => store.auth);
-  const { posts } = useSelector((store) => store.post);
+  const { posts, selectedPost } = useSelector((store) => store.post);
 
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
@@ -23,6 +23,12 @@ const Post = ({ post }) => {
   const [postLike, setPostLike] = useState(post?.likes?.length || 0);
   const [comment, setComment] = useState(post?.comments);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedPost) {
+      setComment(selectedPost?.comments);
+    }
+  }, [selectedPost]);
 
   const changeHandler = (e) => {
     const inputText = e.target.value;
@@ -127,6 +133,9 @@ const Post = ({ post }) => {
           <Link to="/profile" className="text-base font-medium">
             {post?.author?.username}
           </Link>
+          {user?._id === post?.author?._id && (
+            <Badge variant="ghost">Author</Badge>
+          )}
           <div className="flex items-center gap-2">
             <span className="top-2">.</span>
             <span className="text-gray-600 text-sm">4h</span>
