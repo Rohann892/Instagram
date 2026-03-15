@@ -1,71 +1,36 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-const SuggestedUser = () => {
-  const { user } = useSelector((store) => store.auth);
-
+const SuggestedUser = ({ suggestedUser }) => {
   return (
-    <>
-      <div className="flex justify-between my-6">
-        <p className="font-semibold text-gray-500/80 text-sm">
-          Suggested for you
-        </p>
+    <div className="flex items-center justify-between py-1">
+      {/* Left section */}
+      <div className="flex items-center gap-3">
+        <Link to={`/profile/${suggestedUser?._id}`}>
+          <Avatar>
+            <AvatarImage src={suggestedUser?.profileImage} alt="user profile" />
+            <AvatarFallback>
+              {suggestedUser?.username?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
 
-        <p className="text-sm">See All</p>
-      </div>
-      <div className="flex flex-col space-y-3">
-        <div className="flex items-start gap-2">
-          <Link to={`/profile/${user?._id}`}>
-            <Avatar>
-              <AvatarImage src={user?.profileImage} alt="user profileImage" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="flex flex-col">
+          <Link to={`/profile/${suggestedUser?._id}`}>
+            <h1 className="font-semibold text-sm">{suggestedUser?.username}</h1>
+            <span className="text-xs text-gray-500">
+              {suggestedUser?.bio || "Bio here............"}
+            </span>
           </Link>
-          <div className="flex flex-col gap-1">
-            <Link to={`/profile/${user?._id}`}>
-              <h1 className="font-semibold text-sm">{user?.username}</h1>
-              <span className="text-sm text-gray-600 text-xs">
-                {user?.bio || "bio here....."}
-              </span>
-            </Link>
-          </div>
-          <div>
-            <p className="text-sm text-blue-500/80 hover:underline">Follow</p>
-          </div>
-        </div>
-        {/* user - 2 */}
-        <div className="flex items-start gap-2">
-          <Link to={`/profile/${user?._id}`}>
-            <Avatar>
-              <AvatarImage src={user?.profileImage} alt="user profileImage" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </Link>
-          <div className="flex flex-col gap-1">
-            <Link to={`/profile/${user?._id}`}>
-              <h1 className="font-semibold text-sm">{user?.username}</h1>
-              <span className="text-sm text-gray-600 text-xs">
-                {user?.bio || "bio here....."}
-              </span>
-            </Link>
-          </div>
-          <div>
-            <p className="text-sm text-blue-500/80 hover:underline">Follow</p>
-          </div>
         </div>
       </div>
-      <div className="flex flex-col">
-        <p className="text-sm text-gray-400">
-          About Help Press, API, Jobs Privacy, Terms
-        </p>
-        <p className="text-sm text-gray-400">Location Language. Meta verfied</p>
-        <span className="text-sm text-gray-400 mt-5">
-          © 2026 INSTAGRAM FROM META
-        </span>
-      </div>
-    </>
+
+      {/* Follow button always right */}
+      <p className="text-sm text-blue-500 font-semibold hover:underline cursor-pointer">
+        Follow
+      </p>
+    </div>
   );
 };
 

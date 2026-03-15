@@ -8,7 +8,7 @@ const router = express.Router();
 router.route('/register').post(register);
 router.route('/login').post(login);
 router.route('/logout').get(logout);
-router.route('/profile').get(isAuthenticated, getMyProfile)
+router.route('/profile/:id').get(isAuthenticated, getMyProfile)
 router.route('/profile/edit').post(isAuthenticated, upload.single('profileImage'), editProfile)
 router.route('/suggested').get(isAuthenticated, getSuggestedUser);
 router.route('/followOrUnfollow/:id').post(isAuthenticated, followOrUnfollow)

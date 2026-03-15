@@ -23,7 +23,7 @@ const userModel = new mongoose.Schema({
 
     bio: {
         type: String,
-        defalut: ''
+        default: ''
     },
     gender: {
         type: String,
@@ -31,7 +31,7 @@ const userModel = new mongoose.Schema({
     },
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Post",
     }],
     followers: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -39,7 +39,7 @@ const userModel = new mongoose.Schema({
     }],
     following: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
+        ref: "User",
     }],
     bookmarks: [{
         type: mongoose.Schema.Types.ObjectId,

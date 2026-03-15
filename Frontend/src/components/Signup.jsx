@@ -31,7 +31,6 @@ const Signup = () => {
     if (login) {
       try {
         setloading(true);
-        console.log("Attempting login with:", input);
         const res = await axios.post(
           `${USER_API_END_POINT}/login`,
           { email: input.email, password: input.password },
@@ -41,7 +40,6 @@ const Signup = () => {
         );
         if (res.data.success) {
           toast.success(res.data.message);
-          console.log("Login successful:", res);
           dispatch(setAuthUser(res.data.user));
           navigate("/home");
         }
@@ -65,7 +63,6 @@ const Signup = () => {
           },
         );
         if (res.data.success) {
-          console.log(res);
           setLogin(true);
         }
       } catch (error) {
