@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { USER_API_END_POINT } from "@/lib/constant";
 import axios from "axios";
@@ -74,7 +74,10 @@ const LeftSideBar = () => {
     <div className="group fixed top-0 left-0 z-10 h-screen border-r border-gray-300 bg-white transition-all duration-300 w-16 hover:w-48">
       <div className="flex flex-col mt-6 gap-10 justify-between">
         <div className="flex items-start ml-4">
-          <IoLogoInstagram className="w-7 h-7" />
+          <Link to="/home">
+            {" "}
+            <IoLogoInstagram className="w-7 h-7" />
+          </Link>
         </div>
         <div>
           {sideBarItems.map((item, index) => (

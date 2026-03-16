@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { useSelector } from "react-redux";
 import useGetProfile from "@/hooks/useGetProfile";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { TbMessageCircleFilled } from "react-icons/tb";
 
@@ -24,7 +24,7 @@ const Profile = () => {
   const displayedPost =
     activeTab === "post" ? profile?.posts : profile?.bookmarks;
   return (
-    <div className="h-screen max-w-7xl mx-auto flex items-start justify-center gap-16 mt-15">
+    <div className="h-screen max-w-6xl mx-auto flex items-start justify-center gap-16 mt-15">
       <div className="flex flex-col gap-20 p-8">
         <div className="grid grid-cols-2">
           {/* Avatar */}
@@ -72,9 +72,11 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               {user?._id === profile?._id ? (
                 <>
-                  <Button variant="secondary" className={`px-15.5`}>
-                    Edit Profile
-                  </Button>
+                  <Link to="/account/edit">
+                    <Button variant="secondary" className={`px-15.5`}>
+                      Edit Profile
+                    </Button>
+                  </Link>
                   <Button variant="secondary" className={`px-15.5`}>
                     View Archive
                   </Button>
