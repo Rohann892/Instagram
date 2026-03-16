@@ -9,6 +9,8 @@ import messageRoute from './routes/messageRoute.js'
 
 dotenv.config();
 
+const API_BASE_URL = process.env.API_BASE_URL;
+
 const app = express();
 const PORT = process.env.PORT || 8000;
 
@@ -18,7 +20,7 @@ app.use(cookieParser())
 app.use(urlencoded({ extended: true }))
 
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: API_BASE_URL || 'http://localhost:5173',
     credentials: true
 }
 app.use(cors(corsOptions));
