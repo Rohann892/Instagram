@@ -12,7 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "sonner";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
-import API_BASE_URL from "../main";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Post = ({ post }) => {
   const { user } = useSelector((store) => store.auth);

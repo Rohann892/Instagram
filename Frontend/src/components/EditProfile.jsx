@@ -7,7 +7,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import API_BASE_URL from "../main";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const EditProfile = () => {
   const navigate = useNavigate();
