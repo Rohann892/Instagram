@@ -20,7 +20,7 @@ app.use(cookieParser())
 app.use(urlencoded({ extended: true }))
 
 const corsOptions = {
-    origin: API_BASE_URL || 'http://localhost:5173',
+    origin: 'https://instagram-ten-murex.vercel.app',
     credentials: true
 }
 app.use(cors(corsOptions));
