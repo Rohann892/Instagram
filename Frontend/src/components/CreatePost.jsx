@@ -9,6 +9,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "@/redux/postSlice";
+import API_BASE_URL from "../main";
 
 const CreatePost = ({ open, setOpen }) => {
   const imageRef = useRef();
@@ -29,7 +30,7 @@ const CreatePost = ({ open, setOpen }) => {
     try {
       setLoading(true);
       const res = await axios.post(
-        `http://localhost:8080/api/v1/post/addpost`,
+        `${API_BASE_URL}/api/v1/post/addpost`,
         formData,
         {
           headers: {

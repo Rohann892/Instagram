@@ -2,6 +2,7 @@ import { setUserProfile } from "@/redux/authSlice";
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import API_BASE_URL from "../main";
 
 const useGetProfile = (userId) => {
   const dispatch = useDispatch();
@@ -12,7 +13,7 @@ const useGetProfile = (userId) => {
     const fetchUserProfile = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/v1/user/profile/${userId}`,
+          `${API_BASE_URL}/api/v1/user/profile/${userId}`,
           {
             withCredentials: true,
           },

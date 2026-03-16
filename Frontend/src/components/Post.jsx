@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "sonner";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
+import API_BASE_URL from "../main";
 
 const Post = ({ post }) => {
   const { user } = useSelector((store) => store.auth);
@@ -43,7 +44,7 @@ const Post = ({ post }) => {
     try {
       const action = liked ? "dislike" : "like";
       const res = await axios.post(
-        `http://localhost:8080/api/v1/post/${postId}/${action}`,
+        `${API_BASE_URL}/api/v1/post/${postId}/${action}`,
         { id: user?._id },
         { withCredentials: true },
       );
@@ -73,7 +74,7 @@ const Post = ({ post }) => {
   const deletePost = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:8080/api/v1/post/delete/${post._id}`,
+        `${API_BASE_URL}/api/v1/post/delete/${post._id}`,
         {},
         {
           withCredentials: true,
@@ -96,7 +97,7 @@ const Post = ({ post }) => {
   const commentHandler = async (postId) => {
     try {
       const res = await axios.post(
-        `http://localhost:8080/api/v1/post/${postId}/comment`,
+        `${API_BASE_URL}/api/v1/post/${postId}/comment`,
         { text, id: user?._id },
         {
           headers: {

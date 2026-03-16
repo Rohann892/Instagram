@@ -50,6 +50,8 @@ const LeftSideBar = () => {
       navigate(`/profile/${user?._id}`);
     } else if (textType === "Home") {
       navigate("/home");
+    } else if (textType === "Message") {
+      navigate("/chat");
     }
   };
   const sideBarItems = [
@@ -83,6 +85,7 @@ const LeftSideBar = () => {
           {sideBarItems.map((item, index) => (
             <div
               key={index}
+              onClick={() => sidebarHandler(item.text)}
               className="flex items-center gap-4 px-4 py-3 hover:bg-gray-100 cursor-pointer"
             >
               {/* Icon always visible */}
@@ -91,10 +94,7 @@ const LeftSideBar = () => {
               </div>
 
               {/* Text hidden until hover */}
-              <span
-                onClick={() => sidebarHandler(item.text)}
-                className="hidden group-hover:inline whitespace-nowrap"
-              >
+              <span className="hidden group-hover:inline whitespace-nowrap">
                 {item.text}
               </span>
             </div>

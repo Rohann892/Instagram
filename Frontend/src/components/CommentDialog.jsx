@@ -18,6 +18,7 @@ import Comment from "./Comment";
 import axios from "axios";
 import { setPosts } from "@/redux/postSlice";
 import { toast } from "sonner";
+import API_BASE_URL from "../main";
 
 const CommentDialog = ({ open, setOpen }) => {
   const { posts, selectedPost } = useSelector((store) => store.post);
@@ -39,7 +40,7 @@ const CommentDialog = ({ open, setOpen }) => {
   const sendMessageHandler = async (postId) => {
     try {
       const res = await axios.post(
-        `http://localhost:8080/api/v1/post/${postId}/comment`,
+        `${API_BASE_URL}/api/v1/post/${postId}/comment`,
         { text, id: user?._id },
         {
           headers: {
