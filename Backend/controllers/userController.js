@@ -97,7 +97,7 @@ export const login = async (req, res) => {
             posts: populatedPost,
             bookmarks: user.bookmarks
         }
-        return res.status(200).cookie('token', token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' }).json({
+        return res.status(200).cookie('token', token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'none' }).json({
             success: true,
             message: `welcome back ${user.username}`,
             user,
