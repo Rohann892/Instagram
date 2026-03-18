@@ -5,29 +5,30 @@ const isAuthenticated = (req, res, next) => {
         const { token } = req.cookies;
 
         if (!token) {
-            return res.status(404).json({
+            return res.status(401).json({
                 success: false,
                 message: 'User is not authenticated'
-            })
+            });
         }
 
         const decode = jwt.verify(token, process.env.SECRET_KEY);
+
         if (!decode) {
-            return res.status(404).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Invalid token'
-            })
+            });
         }
+
         req.authUserId = decode.userId;
-        console.log(decode);
         next();
+
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({
+        return res.status(401).json({
             success: false,
-            message: error.message
-        })
+            message: 'Authentication failed'
+        });
     }
-}
+};
 
 export default isAuthenticated;

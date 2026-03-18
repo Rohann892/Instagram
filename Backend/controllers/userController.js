@@ -63,7 +63,7 @@ export const login = async (req, res) => {
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            return res.status(404).json({
+            return res.status(401).json({
                 success: false,
                 message: 'Incorrect email or password'
             })
@@ -97,7 +97,7 @@ export const login = async (req, res) => {
             posts: populatedPost,
             bookmarks: user.bookmarks
         }
-        return res.status(200).cookie('token', token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'none' }).json({
+        return res.status(200).cookie('token', token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'None' }).json({
             success: true,
             message: `welcome back ${user.username}`,
             user,
