@@ -73,6 +73,10 @@ export const login = async (req, res) => {
             userId: user._id
         }
 
+        if (!process.env.SECRET_KEY) {
+            throw new Error("SECRET_KEY is missing");
+        }
+
         const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         const populatedPost = await Promise.all(
