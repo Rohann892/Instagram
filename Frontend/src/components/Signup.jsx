@@ -45,12 +45,13 @@ const Signup = () => {
         }
       } catch (error) {
         console.log("Login error:", error.response?.data?.message);
+        toast.error(error.response?.data?.message || "Login failed");
       } finally {
         setloading(false);
       }
     } else {
       try {
-        setloading(false);
+        setloading(true);
         const res = await axios.post(
           `${USER_API_END_POINT}/register`,
           {
@@ -63,10 +64,17 @@ const Signup = () => {
           },
         );
         if (res.data.success) {
+          toast.success(res.data.message);
+          setInput({
+            username: "",
+            email: "",
+            password: "",
+          });
           setLogin(true);
         }
       } catch (error) {
         console.log(error);
+        toast.error(error.response?.data?.message || "Signup failed");
       } finally {
         setloading(false);
       }
