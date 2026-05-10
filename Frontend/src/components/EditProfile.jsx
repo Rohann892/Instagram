@@ -7,6 +7,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { serverUrl } from "@/App";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -40,7 +41,7 @@ const EditProfile = () => {
       if (profileImage) formData.append("profileImage", profileImage);
 
       const res = await axios.post(
-        `${API_BASE_URL}/api/v1/user/profile/edit`,
+        `${serverUrl}/api/v1/user/profile/edit`,
         formData,
         {
           withCredentials: true,

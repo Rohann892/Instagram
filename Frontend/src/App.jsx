@@ -35,6 +35,9 @@ const browserRouter = createBrowserRouter([
     element: <Signup />,
   },
 ]);
+
+export const serverUrl = "http://localhost:8080";
+
 function App() {
   return (
     <>

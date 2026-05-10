@@ -1,9 +1,8 @@
+import { serverUrl } from "@/App";
 import { setUserProfile } from "@/redux/authSlice";
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const useGetProfile = (userId) => {
   const dispatch = useDispatch();
@@ -14,7 +13,7 @@ const useGetProfile = (userId) => {
     const fetchUserProfile = async () => {
       try {
         const res = await axios.get(
-          `${API_BASE_URL}/api/v1/user/profile/${userId}`,
+          `${serverUrl}/api/v1/user/profile/${userId}`,
           {
             withCredentials: true,
           },

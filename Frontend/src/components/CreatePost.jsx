@@ -9,6 +9,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "@/redux/postSlice";
+import { serverUrl } from "@/App";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -31,7 +32,7 @@ const CreatePost = ({ open, setOpen }) => {
     try {
       setLoading(true);
       const res = await axios.post(
-        `${API_BASE_URL}/api/v1/post/addpost`,
+        `${serverUrl}/api/v1/post/addpost`,
         formData,
         {
           headers: {

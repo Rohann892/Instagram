@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
+import { serverUrl } from "@/App";
 
 const Signup = () => {
   const [login, setLogin] = useState(true);
@@ -32,7 +33,7 @@ const Signup = () => {
       try {
         setloading(true);
         const res = await axios.post(
-          `${USER_API_END_POINT}/login`,
+          `${serverUrl}/api/v1/user/login`,
           { email: input.email, password: input.password },
           {
             withCredentials: true,
@@ -53,7 +54,7 @@ const Signup = () => {
       try {
         setloading(true);
         const res = await axios.post(
-          `${USER_API_END_POINT}/register`,
+          `${serverUrl}/api/v1/user/register`,
           {
             username: input.username,
             email: input.email,

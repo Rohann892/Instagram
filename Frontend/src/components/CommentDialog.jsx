@@ -18,6 +18,7 @@ import Comment from "./Comment";
 import axios from "axios";
 import { setPosts } from "@/redux/postSlice";
 import { toast } from "sonner";
+import { serverUrl } from "@/App";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -41,7 +42,7 @@ const CommentDialog = ({ open, setOpen }) => {
   const sendMessageHandler = async (postId) => {
     try {
       const res = await axios.post(
-        `${API_BASE_URL}/api/v1/post/${postId}/comment`,
+        `${serverUrl}/api/v1/post/${postId}/comment`,
         { text, id: user?._id },
         {
           headers: {
