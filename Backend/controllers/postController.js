@@ -4,6 +4,7 @@ import Post from '../models/postModel.js'
 import cloudinary from '../config/cloudinary.js';
 import User from '../models/userModel.js';
 import Comment from '../models/commentSchema.js'
+import { getReceiverSocketId, io } from "../socket/socket.js";
 import { populate } from 'dotenv';
 
 export const addPost = async (req, res) => {
@@ -139,6 +140,31 @@ export const likePost = async (req, res) => {
         await post.save();
 
         // socket.io logic for real time notification
+        const user = await User.findById(id).select('username profileImage');
+        const postOwnerId = post.author.toString();
+        
+        console.log("LIKED POST! Liker:", id, "PostOwner:", postOwnerId);
+        
+        if (postOwnerId !== id) {
+            const notification = {
+                type: 'like',
+                userId: id,
+                userDetails: user,
+                postId,
+                message: 'Your post was liked'
+            };
+            const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+            
+            console.log("Notification payload:", notification);
+            console.log("Receiver Socket ID:", postOwnerSocketId);
+            
+            if (postOwnerSocketId) {
+                console.log("Emitting notification to", postOwnerSocketId);
+                io.to(postOwnerSocketId).emit('notification', notification);
+            } else {
+                console.log("User is offline, cannot emit notification.");
+            }
+        }
 
         return res.status(200).json({
             success: true,
@@ -177,6 +203,18 @@ export const dislikePost = async (req, res) => {
         await post.save();
 
         // socket.io logic
+        const postOwnerId = post.author.toString();
+        if (postOwnerId !== id) {
+            const notification = {
+                type: 'dislike',
+                userId: id,
+                postId,
+            };
+            const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+            if (postOwnerSocketId) {
+                io.to(postOwnerSocketId).emit('notification', notification);
+            }
+        }
 
         return res.status(201).json({
             success: true,

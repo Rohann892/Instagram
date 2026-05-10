@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { setSelectedUser, setMessages } from "@/redux/chatSlice";
+import { setMessageNotification } from "@/redux/rtnSlice";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
@@ -72,7 +73,10 @@ const ChatPage = () => {
             return (
               <div
                 key={suggestedUser?._id}
-                onClick={() => dispatch(setSelectedUser(suggestedUser))}
+                onClick={() => {
+                  dispatch(setSelectedUser(suggestedUser));
+                  dispatch(setMessageNotification({ type: 'clear', senderId: suggestedUser?._id }));
+                }}
                 className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-50 ${
                   selectedUser?._id === suggestedUser?._id ? "bg-gray-100" : ""
                 }`}

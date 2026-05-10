@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessages } from "@/redux/chatSlice";
+import { setMessageNotification } from "@/redux/rtnSlice";
 
 const useRealTimeMessage = () => {
     const dispatch = useDispatch();
@@ -14,6 +15,8 @@ const useRealTimeMessage = () => {
             // Only append the message if the chat is currently active with the sender
             if (selectedUser?._id === newMessage.senderId) {
                 dispatch(setMessages([...messages, newMessage]));
+            } else {
+                dispatch(setMessageNotification({ type: 'add', message: newMessage }));
             }
         });
 

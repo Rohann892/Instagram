@@ -18,12 +18,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
 import CreatePost from "./CreatePost";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
+import { clearLikeNotification } from "@/redux/rtnSlice";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
+  const { likeNotification, messageNotification } = useSelector((store) => store.realTimeNotification);
   const logoutHandler = async () => {
     try {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
@@ -52,14 +54,36 @@ const LeftSideBar = () => {
       navigate("/home");
     } else if (textType === "Message") {
       navigate("/chat");
+    } else if (textType === "Notification") {
+      dispatch(clearLikeNotification());
     }
   };
   const sideBarItems = [
     { icon: <Home size={22} />, text: "Home" },
     { icon: <Search size={22} />, text: "Search" },
     { icon: <TrendingUp size={22} />, text: "Trending" },
-    { icon: <MessageCircle size={22} />, text: "Message" },
-    { icon: <Heart size={22} />, text: "Notification" },
+    { 
+      icon: (
+        <div className="relative">
+          <MessageCircle size={22} />
+          {messageNotification.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          )}
+        </div>
+      ), 
+      text: "Message" 
+    },
+    { 
+      icon: (
+        <div className="relative">
+          <Heart size={22} />
+          {likeNotification.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          )}
+        </div>
+      ), 
+      text: "Notification" 
+    },
     { icon: <PlusSquare size={22} />, text: "Create" },
     {
       icon: (

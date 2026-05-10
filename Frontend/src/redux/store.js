@@ -3,6 +3,7 @@ import authSlice from './authSlice'
 import postSlice from './postSlice'
 import chatSlice from './chatSlice'
 import socketSlice from './socketSlice'
+import rtnSlice from './rtnSlice'
 import {
     persistReducer,
     FLUSH,
@@ -19,13 +20,14 @@ const rootReducer = combineReducers({
     post: postSlice,
     chat: chatSlice,
     socketio: socketSlice,
+    realTimeNotification: rtnSlice,
 })
 
 const persistConfig = {
     key: 'root',
     version: 1,
     storage,
-    blacklist: ['socketio', 'chat']
+    blacklist: ['socketio', 'chat', 'realTimeNotification']
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

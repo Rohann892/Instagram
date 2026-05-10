@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import { setSocket } from "./redux/socketSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
+import { setLikeNotification } from "./redux/rtnSlice";
 import Signup from "./components/Signup";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "./components/MainLayout";
@@ -62,7 +63,14 @@ function App() {
         dispatch(setOnlineUsers(onlineUsers));
       });
 
+      socketio.on("notification", (notification) => {
+        console.log("RECEIVED NOTIFICATION IN FRONTEND:", notification);
+        dispatch(setLikeNotification(notification));
+      });
+
       return () => {
+        socketio.off("getOnlineUsers");
+        socketio.off("notification");
         socketio.close();
         dispatch(setSocket(null));
       };
