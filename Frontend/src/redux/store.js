@@ -1,6 +1,8 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authSlice from './authSlice'
 import postSlice from './postSlice'
+import chatSlice from './chatSlice'
+import socketSlice from './socketSlice'
 import {
     persistReducer,
     FLUSH,
@@ -15,12 +17,15 @@ import storage from 'redux-persist/lib/storage'
 const rootReducer = combineReducers({
     auth: authSlice,
     post: postSlice,
+    chat: chatSlice,
+    socketio: socketSlice,
 })
 
 const persistConfig = {
     key: 'root',
     version: 1,
     storage,
+    blacklist: ['socketio', 'chat']
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

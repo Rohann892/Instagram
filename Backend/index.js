@@ -9,9 +9,10 @@ import messageRoute from './routes/messageRoute.js'
 
 dotenv.config();
 
+import { app, server } from './socket/socket.js';
+
 const API_BASE_URL = process.env.API_BASE_URL;
 
-const app = express();
 const PORT = process.env.PORT || 8000;
 
 // middlewares
@@ -37,6 +38,6 @@ app.use('/api/v1/message', messageRoute);
 
 
 connectDb();
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server started at ${PORT}`)
 })
