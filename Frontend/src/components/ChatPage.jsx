@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { setSelectedUser, setMessages } from "@/redux/chatSlice";
 import { setMessageNotification } from "@/redux/rtnSlice";
+import { setOutgoingCall, setCallStatus } from "@/redux/callSlice";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Send } from "lucide-react";
+import { Send, Phone, Video } from "lucide-react";
 import axios from "axios";
 import { MESSAGE_API_END_POINT } from "@/lib/constant";
 import useGetMessages from "@/hooks/useGetMessages";
@@ -19,6 +20,20 @@ const ChatPage = () => {
   );
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
+
+  // Initiate an outgoing call
+  const startCall = (type) => {
+    if (!selectedUser) return;
+    dispatch(
+      setOutgoingCall({
+        receiverId: selectedUser._id,
+        receiverName: selectedUser.username,
+        receiverAvatar: selectedUser.profileImage,
+        callType: type,
+      })
+    );
+    dispatch(setCallStatus("ringing"));
+  };
 
   // Initialize hooks to fetch historical messages and listen to socket
   useGetMessages();
@@ -110,9 +125,26 @@ const ChatPage = () => {
                 <AvatarImage src={selectedUser?.profileImage} />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold">{selectedUser?.username}</p>
               </div>
+              {/* Call buttons */}
+              <button
+                id="audio-call-btn"
+                onClick={() => startCall("audio")}
+                title="Audio call"
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600 hover:text-green-600"
+              >
+                <Phone size={20} />
+              </button>
+              <button
+                id="video-call-btn"
+                onClick={() => startCall("video")}
+                title="Video call"
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600 hover:text-blue-600"
+              >
+                <Video size={20} />
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2 bg-gray-50">

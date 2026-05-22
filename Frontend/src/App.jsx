@@ -4,18 +4,31 @@ import { io } from "socket.io-client";
 import { setSocket } from "./redux/socketSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { setLikeNotification } from "./redux/rtnSlice";
+import { setIncomingCall, setCallStatus } from "./redux/callSlice";
 import Signup from "./components/Signup";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import MainLayout from "./components/MainLayout";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import ChatPage from "./components/ChatPage";
+import CallModal from "./components/CallModal";
+
+// Protects routes — redirects to /login if not authenticated
+const ProtectedRoute = ({ children }) => {
+  const { user } = useSelector((store) => store.auth);
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
 
 const browserRouter = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "/home",
@@ -68,9 +81,16 @@ function App() {
         dispatch(setLikeNotification(notification));
       });
 
+      // Listen for incoming calls
+      socketio.on("incomingCall", (callData) => {
+        dispatch(setIncomingCall(callData));
+        dispatch(setCallStatus("ringing"));
+      });
+
       return () => {
         socketio.off("getOnlineUsers");
         socketio.off("notification");
+        socketio.off("incomingCall");
         socketio.close();
         dispatch(setSocket(null));
       };
@@ -82,9 +102,11 @@ function App() {
 
   return (
     <>
+      <CallModal />
       <RouterProvider router={browserRouter} />
     </>
   );
 }
 
 export default App;
+
