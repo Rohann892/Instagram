@@ -90,11 +90,12 @@ const Signup = () => {
         onSubmit={loginSignupHandler}
         className="shadow-xl flex flex-col gap-5 p-8"
       >
-        <div className="my-4">
-          <h1 className="font-bold text-center text-2xl">Logo</h1>
-          <p>
-            <span>{login ? "Login" : "Signup"}</span> to see Photos and videos
-            from your friend
+        <div className="my-4 text-center">
+          <h1 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+            Connectly
+          </h1>
+          <p className="text-sm text-gray-500 mt-2">
+            <span>{login ? "Log in" : "Sign up"}</span> to see photos and videos from your friends
           </p>
         </div>
         {!login && (

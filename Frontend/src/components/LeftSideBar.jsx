@@ -5,6 +5,7 @@ import {
   MessageCircle,
   PlusSquare,
   Search,
+  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import React, { useState } from "react";
@@ -13,7 +14,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { USER_API_END_POINT } from "@/lib/constant";
 import axios from "axios";
-import { IoLogoInstagram } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
 import CreatePost from "./CreatePost";
@@ -101,10 +101,14 @@ const LeftSideBar = () => {
   return (
     <div className="group fixed top-0 left-0 z-10 h-screen border-r border-gray-300 bg-white transition-all duration-300 w-16 hover:w-48">
       <div className="flex flex-col mt-6 gap-10 justify-between">
-        <div className="flex items-start ml-4">
-          <Link to="/home">
-            {" "}
-            <IoLogoInstagram className="w-7 h-7" />
+        <div className="flex items-center ml-4">
+          <Link to="/home" className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 via-pink-500 to-rose-400 flex items-center justify-center text-white shadow-md">
+              <Sparkles size={18} />
+            </div>
+            <span className="hidden group-hover:inline font-bold text-lg tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Connectly
+            </span>
           </Link>
         </div>
         <div>

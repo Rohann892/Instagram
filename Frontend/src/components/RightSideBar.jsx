@@ -43,7 +43,7 @@ const RightSideBar = () => {
         </p>
         <p className="text-sm text-gray-400">Location Language. Meta verfied</p>
         <span className="text-sm text-gray-400 mt-5">
-          © 2026 INSTAGRAM FROM META
+          © 2026 CONNECTLY
         </span>
       </div>
     </div>
