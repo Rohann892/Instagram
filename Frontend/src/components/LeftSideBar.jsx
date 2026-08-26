@@ -32,13 +32,15 @@ const LeftSideBar = () => {
         withCredentials: true,
       });
       if (res.data.success) {
+        localStorage.removeItem("token");
         dispatch(setAuthUser(null));
         dispatch(setSelectedPost(null));
         dispatch(setPosts([]));
         toast.success(res.data.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      localStorage.removeItem("token");
+      toast.error(error.response?.data?.message || "Logged out");
     }
   };
 

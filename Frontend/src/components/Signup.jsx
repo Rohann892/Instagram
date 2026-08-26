@@ -40,6 +40,9 @@ const Signup = () => {
           },
         );
         if (res.data.success) {
+          if (res.data.token) {
+            localStorage.setItem("token", res.data.token);
+          }
           toast.success(res.data.message);
           dispatch(setAuthUser(res.data.user));
           navigate("/home");

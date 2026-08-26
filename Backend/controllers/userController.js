@@ -101,10 +101,12 @@ export const login = async (req, res) => {
             posts: populatedPost,
             bookmarks: user.bookmarks
         }
+        const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
         return res.status(200).cookie('token', token, { 
             maxAge: 1 * 24 * 60 * 60 * 1000, 
             httpOnly: true, 
-            sameSite: 'lax' // using lax for local testing across ports
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction
         }).json({
             success: true,
             message: `welcome back ${user.username}`,
@@ -124,9 +126,11 @@ export const login = async (req, res) => {
 
 export const logout = (_, res) => {
     try {
+        const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
         return res.status(200).cookie('token', "", { 
             maxAge: 0,
-            sameSite: 'lax'
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction
         }).json({
             success: true,
             message: 'Logged out Successfully'
