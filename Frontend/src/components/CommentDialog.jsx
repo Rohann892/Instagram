@@ -1,17 +1,15 @@
-import React, { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import PostImg from "../assets/postImage.jpg";
+import React, { useState, useEffect } from "react";
+import { Dialog, DialogContent } from "./ui/dialog";
 import {
-  Badge,
   MessageCircle,
   MoreHorizontal,
   Send,
-  TicketX,
+  X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
-import { IoMdHeartEmpty } from "react-icons/io";
+import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { CiBookmark, CiFaceSmile } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
 import Comment from "./Comment";
@@ -20,27 +18,29 @@ import { setPosts } from "@/redux/postSlice";
 import { toast } from "sonner";
 import { serverUrl } from "@/App";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const CommentDialog = ({ open, setOpen }) => {
   const { posts, selectedPost } = useSelector((store) => store.post);
   const { user } = useSelector((store) => store.auth);
 
-  const [comment, setComment] = useState(selectedPost?.comments || []);
+  const [comment, setComment] = useState([]);
   const dispatch = useDispatch();
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedPost) {
+      setComment(selectedPost?.comments || []);
+    }
+  }, [selectedPost]);
 
   const changeHandler = (e) => {
-    const inputText = e.target.value;
-    if (inputText.trim()) {
-      setText(inputText);
-    } else {
-      setText("");
-    }
+    setText(e.target.value);
   };
 
   const sendMessageHandler = async (postId) => {
+    if (!text.trim()) return;
     try {
+      setLoading(true);
       const res = await axios.post(
         `${serverUrl}/api/v1/post/${postId}/comment`,
         { text, id: user?._id },
@@ -49,17 +49,18 @@ const CommentDialog = ({ open, setOpen }) => {
             "Content-Type": "application/json",
           },
           withCredentials: true,
-        },
+        }
       );
 
       if (res.data.success) {
-        const updatedCommentData = [...comment, res.data.comment];
+        const newComment = res.data.comment;
+        const updatedCommentData = [...comment, newComment];
         setComment(updatedCommentData);
 
         const updatedPostData = posts.map((p) =>
           p._id === selectedPost._id
-            ? { ...p, comments: [...comment, res.data.comment] }
-            : p,
+            ? { ...p, comments: updatedCommentData }
+            : p
         );
         dispatch(setPosts(updatedPostData));
         toast.success(res.data.message);
@@ -67,111 +68,131 @@ const CommentDialog = ({ open, setOpen }) => {
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Failed to post comment");
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         onInteractOutside={() => setOpen(false)}
-        className={`!max-w-5xl p-0 flex flex-col`}
+        className="w-[94vw] sm:w-[90vw] md:max-w-4xl max-h-[85vh] p-0 rounded-2xl md:rounded-3xl overflow-hidden flex flex-col md:flex-row bg-white shadow-2xl border border-slate-200"
       >
-        <div className="flex flex-1">
-          <div className="w-1/2">
-            <img src={selectedPost?.image} alt="" className="rounded-l-xl" />
+        {/* ─── POST IMAGE (Hidden on small mobile if preferred or shown nicely on desktop) ─── */}
+        {selectedPost?.image && (
+          <div className="hidden md:flex md:w-1/2 bg-black items-center justify-center overflow-hidden">
+            <img
+              src={selectedPost?.image}
+              alt="post"
+              className="w-full h-full max-h-[85vh] object-contain"
+            />
           </div>
-          <div className="w-1/2 flex flex-col justify-between mt-2 ml-4">
-            <div className="flex items-center justify-between border-b border-gray-100 p-2">
-              <div className="flex gap-2 items-center">
-                <Avatar>
+        )}
+
+        {/* ─── COMMENTS & ACTIONS PANEL ─── */}
+        <div className="w-full md:w-1/2 flex flex-col h-[75vh] md:h-[85vh] bg-white">
+          {/* Header */}
+          <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-slate-100 shrink-0">
+            <div className="flex items-center gap-3">
+              <Link
+                to={`/profile/${selectedPost?.author?._id}`}
+                onClick={() => setOpen(false)}
+              >
+                <Avatar className="h-9 w-9 ring-2 ring-purple-500/20">
                   <AvatarImage
                     src={selectedPost?.author?.profileImage}
-                    alt="user_img"
+                    alt={selectedPost?.author?.username}
                   />
-                  <AvatarFallback>Cn</AvatarFallback>
+                  <AvatarFallback className="bg-purple-100 text-purple-700 font-semibold text-xs">
+                    {selectedPost?.author?.username?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
                 </Avatar>
-                <Link to="/profile">{selectedPost?.author?.username}</Link>
-              </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <MoreHorizontal className="cursor-pointer" />
-                </DialogTrigger>
-                <DialogContent
-                  className={`flex flex-col items-center text-center`}
+              </Link>
+              <div>
+                <Link
+                  to={`/profile/${selectedPost?.author?._id}`}
+                  onClick={() => setOpen(false)}
+                  className="font-bold text-sm text-slate-800 hover:text-purple-600 transition-colors"
                 >
-                  <Button
-                    variant="ghost"
-                    className={`cursor-pointer w-fit text-[#ed4956] font-bold`}
-                  >
-                    Report
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className={`cursor-pointer w-fit text-[#ed4956] font-bold`}
-                  >
-                    Unfollow
-                  </Button>
-                  <Button variant="ghost" className={`cursor-pointer w-fit`}>
-                    Add to favorites
-                  </Button>
-                  <Button variant="ghost" className={`cursor-pointer w-fit`}>
-                    Go to post
-                  </Button>
-                  <Button variant="ghost" className={`cursor-pointer w-fit`}>
-                    Share to...
-                  </Button>
-                  <Button variant="ghost" className={`cursor-pointer w-fit`}>
-                    Copy Link
-                  </Button>
-                  <Button variant="ghost" className={`cursor-pointer w-fit`}>
-                    About this account
-                  </Button>
-                  <Button variant="ghost" className={`cursor-pointer w-fit`}>
-                    Cancel
-                  </Button>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 border-b border-gray-100">
-              {comment?.map((comment) => (
-                <Comment key={comment?._id} comment={comment} />
-              ))}
-            </div>
-            <div className="flex flex-col mt-2 pb-4 border-b border-gray-100">
-              <div className="flex justify-between space-y-2 p-2">
-                <div className="flex gap-3 cursor-pointer">
-                  <IoMdHeartEmpty className="w-6 h-6" />
-                  <MessageCircle className="w-5 h-5" />
-                  <Send className="w-5 h-5" />
-                </div>
-                <div>
-                  <CiBookmark className="w-6 h-6 cursor-pointer" />
-                </div>
+                  {selectedPost?.author?.username}
+                </Link>
+                {selectedPost?.caption && (
+                  <p className="text-xs text-slate-500 line-clamp-1">
+                    {selectedPost.caption}
+                  </p>
+                )}
               </div>
-              <span className="font-semibold pl-2">
-                {selectedPost?.likes?.length}
-              </span>
-              <span className="pl-2">4 hours ago</span>
             </div>
-            <div className="flex justify-between mt-3 p-2">
-              <div className="flex gap-3">
-                <CiFaceSmile className="w-8 h-8" />
-                <input
-                  type="text"
-                  value={text}
-                  onChange={changeHandler}
-                  placeholder="Add a comment...."
-                  className="w-full border-none outline-none font-medium"
-                />
-              </div>
-              <Button
-                onClick={() => sendMessageHandler(selectedPost?._id)}
-                disabled={!text.trim()}
-                className={`bg-blue-600 text-white text-base font-medium`}
-              >
-                Post
-              </Button>
-            </div>
+
+            <button
+              onClick={() => setOpen(false)}
+              className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <X size={18} />
+            </button>
           </div>
+
+          {/* Comments List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-slate-50">
+            {comment && comment.length > 0 ? (
+              comment.map((item, index) => (
+                <div key={item?._id || index} className="pt-2 first:pt-0">
+                  <Comment comment={item} />
+                </div>
+              ))
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+                <MessageCircle className="w-10 h-10 mb-2 text-purple-200" />
+                <p className="font-semibold text-slate-700 text-sm">No comments yet</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Be the first to start the conversation!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Post Actions & Likes summary */}
+          <div className="p-3.5 sm:p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3 text-slate-700">
+                <IoMdHeartEmpty className="w-6 h-6 hover:text-red-500 cursor-pointer transition-colors" />
+                <MessageCircle className="w-5 h-5 hover:text-purple-600 cursor-pointer transition-colors" />
+                <Send className="w-5 h-5 hover:text-purple-600 cursor-pointer transition-colors" />
+              </div>
+              <CiBookmark className="w-6 h-6 text-slate-700 hover:text-purple-600 cursor-pointer transition-colors" />
+            </div>
+
+            <p className="text-xs font-semibold text-slate-800">
+              {selectedPost?.likes?.length || 0} likes
+            </p>
+          </div>
+
+          {/* Add Comment Input Bar */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessageHandler(selectedPost?._id);
+            }}
+            className="p-3 bg-white border-t border-slate-100 flex items-center gap-2 shrink-0"
+          >
+            <CiFaceSmile className="w-6 h-6 text-slate-400 hidden sm:block shrink-0" />
+            <input
+              type="text"
+              value={text}
+              onChange={changeHandler}
+              placeholder="Add a comment..."
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm focus:bg-white focus:outline-none transition-colors"
+            />
+            <Button
+              type="submit"
+              disabled={!text.trim() || loading}
+              className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all disabled:opacity-50"
+            >
+              Post
+            </Button>
+          </form>
         </div>
       </DialogContent>
     </Dialog>
@@ -179,3 +200,4 @@ const CommentDialog = ({ open, setOpen }) => {
 };
 
 export default CommentDialog;
+
