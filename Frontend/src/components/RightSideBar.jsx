@@ -7,46 +7,67 @@ import SuggestedUser from "./SuggestedUser";
 const RightSideBar = () => {
   const { user, suggestedUsers } = useSelector((store) => store.auth);
   return (
-    <div className="w-fit p-4 pr-32 border-l-1 border-gray-100 bg-gray-50 rounded-md my-10 space-y-6">
-      <div className="flex items-start gap-2">
-        <Link to={`/profile/${user?._id}`}>
-          <Avatar>
-            <AvatarImage src={user?.profileImage} alt="user profileImage" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </Link>
-        <div className="flex flex-col gap-1">
+    <aside className="hidden lg:block w-80 sticky top-6 h-fit bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-2xl p-5 shadow-sm space-y-6 shrink-0">
+      {/* Current user header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <Link to={`/profile/${user?._id}`}>
-            <h1 className="font-semibold text-sm">{user?.username}</h1>
-            <span className="text-sm text-gray-600 text-xs">
-              {user?.bio || "bio here....."}
-            </span>
+            <Avatar className="h-11 w-11 ring-2 ring-purple-500/20">
+              <AvatarImage src={user?.profileImage} alt="user profileImage" />
+              <AvatarFallback className="bg-purple-100 text-purple-700 font-semibold">
+                {user?.username?.charAt(0)?.toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
           </Link>
+          <div className="flex flex-col">
+            <Link to={`/profile/${user?._id}`}>
+              <h2 className="font-bold text-sm text-slate-800 hover:text-purple-600 transition-colors">
+                {user?.username}
+              </h2>
+              <p className="text-xs text-slate-500 line-clamp-1 max-w-[150px]">
+                {user?.bio || "Connectly user"}
+              </p>
+            </Link>
+          </div>
         </div>
-        <div>
-          <p className="text-sm text-blue-500/80 hover:underline">Switch</p>
-        </div>
+        <Link
+          to={`/profile/${user?._id}`}
+          className="text-xs font-semibold text-purple-600 hover:text-purple-700"
+        >
+          View
+        </Link>
       </div>
-      <div className="flex justify-between my-6">
-        <p className="font-semibold text-gray-500/80 text-sm">
-          Suggested for you
-        </p>
 
-        <p className="text-sm">See All</p>
+      {/* Suggested users */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-slate-500 text-xs uppercase tracking-wider">
+            Suggested For You
+          </h3>
+          <button className="text-xs font-semibold text-slate-600 hover:text-slate-900">
+            See All
+          </button>
+        </div>
+
+        <div className="space-y-1">
+          {suggestedUsers && suggestedUsers.length > 0 ? (
+            suggestedUsers.map((suggestedUser, index) => (
+              <SuggestedUser key={index} suggestedUser={suggestedUser} />
+            ))
+          ) : (
+            <p className="text-xs text-slate-400 py-2 text-center">No suggestions right now</p>
+          )}
+        </div>
       </div>
-      {suggestedUsers.map((suggestedUser, index) => (
-        <SuggestedUser key={index} suggestedUser={suggestedUser} />
-      ))}
-      <div className="flex flex-col">
-        <p className="text-sm text-gray-400">
-          About Help Press, API, Jobs Privacy, Terms
+
+      {/* Footer */}
+      <div className="pt-4 border-t border-slate-100 text-slate-400 text-xs space-y-2">
+        <p className="hover:text-slate-500 cursor-pointer transition-colors">
+          About • Help • Press • API • Jobs • Privacy • Terms
         </p>
-        <p className="text-sm text-gray-400">Location Language. Meta verfied</p>
-        <span className="text-sm text-gray-400 mt-5">
-          © 2026 CONNECTLY
-        </span>
+        <p className="font-medium text-slate-400">© 2026 CONNECTLY</p>
       </div>
-    </div>
+    </aside>
   );
 };
 

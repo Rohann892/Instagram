@@ -124,110 +124,149 @@ const Post = ({ post }) => {
     }
   };
   return (
-    <div className="my-8 w-full max-w-sm mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2 items-center">
-          <Avatar>
-            <AvatarImage src={post?.author?.profileImage} alt="post_image" />
-            <AvatarFallback>
-              {post?.author?.username?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <Link to="/profile" className="text-base font-medium">
-            {post?.author?.username}
+    <div className="bg-white border border-slate-200/80 rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm mb-6 w-full max-w-lg mx-auto transition-all">
+      {/* Post Header */}
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex gap-2.5 items-center">
+          <Link to={`/profile/${post?.author?._id}`}>
+            <Avatar className="h-9 w-9 ring-2 ring-purple-500/20">
+              <AvatarImage src={post?.author?.profileImage} alt="post_image" />
+              <AvatarFallback className="bg-purple-100 text-purple-700 text-xs font-bold">
+                {post?.author?.username?.charAt(0)?.toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
           </Link>
-          {user?._id === post?.author?._id && (
-            <Badge variant="ghost">Author</Badge>
-          )}
           <div className="flex items-center gap-2">
-            <span className="top-2">.</span>
-            <span className="text-gray-600 text-sm">4h</span>
+            <Link
+              to={`/profile/${post?.author?._id}`}
+              className="text-sm font-semibold text-slate-800 hover:text-purple-600 transition-colors"
+            >
+              {post?.author?.username}
+            </Link>
+            {user?._id === post?.author?._id && (
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-purple-50 text-purple-700">
+                Author
+              </Badge>
+            )}
           </div>
         </div>
+
         <Dialog>
           <DialogTrigger asChild>
-            <MoreHorizontal className="cursor-pointer" />
+            <button className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <MoreHorizontal className="w-5 h-5 cursor-pointer" />
+            </button>
           </DialogTrigger>
-          <DialogContent className={`flex flex-col items-center text-center`}>
+          <DialogContent className="flex flex-col items-center text-center rounded-2xl max-w-xs">
             <Button
               onClick={deletePost}
               variant="ghost"
-              className={`cursor-pointer w-fit text-[#ed4956] font-bold`}
+              className="cursor-pointer w-full text-red-500 font-semibold hover:bg-red-50"
             >
               {user?._id?.toString() === post?.author?._id?.toString()
-                ? "Delete"
+                ? "Delete Post"
                 : "Unfollow"}
             </Button>
-            <Button variant="ghost" className={`cursor-pointer w-fit`}>
-              Add to favorites
-            </Button>
-            <Button variant="ghost" className={`cursor-pointer w-fit`}>
+            <Button variant="ghost" className="cursor-pointer w-full text-slate-700">
               Cancel
             </Button>
           </DialogContent>
         </Dialog>
       </div>
-      <img
-        src={post?.image}
-        alt=""
-        className="my-2 rounded-md w-full aspect-square object-cover"
-      />
-      <div className="flex justify-between items-center mt-2">
-        <div className="flex gap-3 cursor-pointer">
-          <div className="flex gap-2">
+
+      {/* Post Media */}
+      {post?.image && (
+        <div className="rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 border border-slate-100">
+          <img
+            src={post?.image}
+            alt="post content"
+            className="w-full aspect-square object-cover hover:scale-[1.01] transition-transform duration-300"
+          />
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex justify-between items-center mt-3 px-1">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => likeOrDislikeHandler(post?._id)}
+            className="flex items-center gap-1.5 text-slate-700 hover:text-red-500 transition-colors group"
+          >
             {liked ? (
-              <IoMdHeart
-                onClick={() => likeOrDislikeHandler(post?._id)}
-                className="w-6 h-6 text-red-500 cursor-pointer"
-              />
+              <IoMdHeart className="w-6 h-6 text-red-500 scale-110 transition-transform" />
             ) : (
-              <IoMdHeartEmpty
-                onClick={() => likeOrDislikeHandler(post?._id)}
-                className="w-6 h-6 cursor-pointer"
-              />
+              <IoMdHeartEmpty className="w-6 h-6 group-hover:scale-110 transition-transform" />
             )}
-            <span>{postLike}</span>
-          </div>
-          <div className="flex gap-2">
-            <MessageCircle
-              onClick={() => {
-                setOpen(true);
-                dispatch(setSelectedPost(post));
-              }}
-              className="w-5 h-5"
-            />
-            <span>{post?.comments?.length || 0}</span>
-          </div>
-          <Send className="w-5 h-5" />
+            <span className="text-xs font-semibold">{postLike}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setOpen(true);
+              dispatch(setSelectedPost(post));
+            }}
+            className="flex items-center gap-1.5 text-slate-700 hover:text-purple-600 transition-colors group"
+          >
+            <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-semibold">{post?.comments?.length || 0}</span>
+          </button>
+
+          <button className="text-slate-700 hover:text-purple-600 transition-colors">
+            <Send className="w-5 h-5 hover:scale-110 transition-transform" />
+          </button>
         </div>
-        <div>
-          <CiBookmark className="w-6 h-6 cursor-pointer" />
-        </div>
+
+        <button className="text-slate-700 hover:text-purple-600 transition-colors">
+          <CiBookmark className="w-6 h-6" />
+        </button>
       </div>
-      <p>
-        <span className="text-base font-semibold">Rohann</span> {post?.caption}
-      </p>
-      {/* <span className="cursor-pointer text-sm text-gray-400">
-        View all 25 comments
-      </span> */}
+
+      {/* Caption & Author */}
+      {post?.caption && (
+        <div className="mt-2 px-1 text-sm text-slate-800">
+          <Link
+            to={`/profile/${post?.author?._id}`}
+            className="font-semibold mr-2 hover:text-purple-600 transition-colors"
+          >
+            {post?.author?.username}
+          </Link>
+          <span className="text-slate-700">{post?.caption}</span>
+        </div>
+      )}
+
+      {/* Comments link */}
+      {post?.comments?.length > 0 && (
+        <p
+          onClick={() => {
+            setOpen(true);
+            dispatch(setSelectedPost(post));
+          }}
+          className="text-xs text-slate-400 mt-1 px-1 cursor-pointer hover:text-slate-600"
+        >
+          View all {post.comments.length} comments
+        </p>
+      )}
+
       <CommentDialog open={open} setOpen={setOpen} />
-      <div className="flex items-center justify-between">
+
+      {/* Comment Input */}
+      <div className="flex items-center justify-between gap-2 mt-3 pt-2.5 border-t border-slate-100 px-1">
         <input
           type="text"
           value={text}
           onChange={changeHandler}
-          placeholder="Add a Comment"
-          className="outline-none text-sm"
+          placeholder="Add a comment..."
+          className="flex-1 bg-transparent text-sm placeholder:text-slate-400 outline-none"
         />
         {text ? (
-          <span
+          <button
             onClick={() => commentHandler(post?._id)}
-            className="text-sm px-2 py-1 bg-[#3badf8] text-white rounded-md"
+            className="text-xs font-bold text-purple-600 hover:text-purple-700 px-2 py-1 rounded-lg hover:bg-purple-50 transition-colors"
           >
             Post
-          </span>
+          </button>
         ) : (
-          <CiFaceSmile />
+          <CiFaceSmile className="w-5 h-5 text-slate-400" />
         )}
       </div>
     </div>
