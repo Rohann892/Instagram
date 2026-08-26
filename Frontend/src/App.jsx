@@ -54,7 +54,7 @@ const browserRouter = createBrowserRouter([
   },
 ]);
 
-export const serverUrl = "http://localhost:8080";
+export const serverUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 function App() {
   const { user } = useSelector((store) => store.auth);
