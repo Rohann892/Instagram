@@ -134,7 +134,7 @@ const Signup = () => {
         ) : (
           <Button type="submit">{login ? "Login" : "Signup"}</Button>
         )}
-        <p className="text-sm text-center">
+        <p className="text-sm text-center cursor-pointer">
           {login ? "Do not have an Account" : "Already have an account"}{" "}
           <span
             onClick={() => setLogin(!login)}
